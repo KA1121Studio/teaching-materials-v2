@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ANDROID URL Test</title>
+</head>
+<body style="background:#111;color:#fff">
+
+
+
+<video id="video" controls muted playsinline style="width:100%"></video>
+<audio id="audio" style="display:none"></audio>
+
+<script>
+const videoId = "niKAylKNIEI";
+const videoEl = document.getElementById("video");
+const audioEl = document.getElementById("audio");
+
+// fetchで動画・音声URLを取得
+async function load() {
+  const res = await fetch(`/video?id=${videoId}`);
+  const data = await res.json();
+
+  if (!data.video || !data.audio) {
+    console.error("動画または音声URLがありません", data);
+    return;
+  }
+
+videoEl.src = data.video;
+audioEl.src = data.audio;
+
+  
+  // video再生時にaudioも同期再生
+  videoEl.addEventListener("play", () => {
+    audioEl.play();
+  });
+
+  videoEl.addEventListener("pause", () => {
+    audioEl.pause();
+  });
+
+  videoEl.addEventListener("seeking", () => {
+    audioEl.currentTime = videoEl.currentTime;
+  });
+
+  videoEl.addEventListener("ratechange", () => {
+    audioEl.playbackRate = videoEl.playbackRate;
+  });
+}
+
+load();
+</script>
+
+
+</body>
+</html>
