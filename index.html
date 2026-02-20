@@ -7,51 +7,27 @@
 </head>
 <body style="background:#111;color:#fff">
 
-
-
-<video id="video" controls muted playsinline style="width:100%"></video>
-<audio id="audio" style="display:none"></audio>
+<video id="video" controls playsinline style="width:100%"></video>
 
 <script>
 const videoId = "niKAylKNIEI";
 const videoEl = document.getElementById("video");
-const audioEl = document.getElementById("audio");
 
-// fetchで動画・音声URLを取得
+// fetchで動画URLを取得
 async function load() {
   const res = await fetch(`/video?id=${videoId}`);
   const data = await res.json();
 
-  if (!data.video || !data.audio) {
-    console.error("動画または音声URLがありません", data);
+  if (!data.video) {
+    console.error("動画URLがありません", data);
     return;
   }
 
-videoEl.src = data.video;
-audioEl.src = data.audio;
-
-  
-  // video再生時にaudioも同期再生
-  videoEl.addEventListener("play", () => {
-    audioEl.play();
-  });
-
-  videoEl.addEventListener("pause", () => {
-    audioEl.pause();
-  });
-
-  videoEl.addEventListener("seeking", () => {
-    audioEl.currentTime = videoEl.currentTime;
-  });
-
-  videoEl.addEventListener("ratechange", () => {
-    audioEl.playbackRate = videoEl.playbackRate;
-  });
+  videoEl.src = data.video;
 }
 
 load();
 </script>
-
 
 </body>
 </html>
