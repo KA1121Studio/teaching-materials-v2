@@ -11,14 +11,12 @@
 </head>
 <body>
 
-<video id="video" controls muted playsinline></video>
-<audio id="audio" style="display:none"></audio>
+<video id="video" controls playsinline></video>
 
 <script>
 const params = new URLSearchParams(window.location.search);
 const videoId = params.get("id");
 const videoEl = document.getElementById("video");
-const audioEl = document.getElementById("audio");
 
 if (!videoId) {
   alert("動画IDが必要です");
@@ -26,20 +24,12 @@ if (!videoId) {
   fetch(`/video?id=${videoId}`)
     .then(res => res.json())
     .then(data => {
-      if (!data.video || !data.audio) {
-        alert("動画または音声URLが取得できません");
+      if (!data.video) {
+        alert("動画URLが取得できません");
         return;
       }
 
       videoEl.src = "/proxy?url=" + encodeURIComponent(data.video);
-      audioEl.src = "/proxy?url=" + encodeURIComponent(data.audio);
-
-
-      // 動画と音声を同期
-      videoEl.addEventListener("play", () => audioEl.play());
-      videoEl.addEventListener("pause", () => audioEl.pause());
-      videoEl.addEventListener("seeking", () => audioEl.currentTime = videoEl.currentTime);
-      videoEl.addEventListener("ratechange", () => audioEl.playbackRate = videoEl.playbackRate);
     })
     .catch(err => {
       console.error(err);
