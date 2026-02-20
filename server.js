@@ -43,24 +43,29 @@ app.get("/video", async (req, res) => {
   if (!videoId) return res.status(400).json({ error: "video id required" });
 
   try {
-    // yt-dlpで動画と音声を取得
     const output = execSync(
-      `yt-dlp --cookies youtube-cookies.txt --js-runtimes node --remote-components ejs:github --sleep-requests 1 --user-agent "Mozilla/5.0" --get-url -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]" https://youtu.be/${videoId}`
-    ).toString().trim().split("\n");
+      `yt-dlp --cookies youtube-cookies.txt \
+--js-runtimes node \
+--remote-components ejs:github \
+--sleep-requests 1 \
+--user-agent "Mozilla/5.0" \
+--get-url \
+-f "best[ext=mp4]/best" \
+https://youtu.be/${videoId}`
+    ).toString().trim();
 
-    const videoUrl = output[0]; // 動画URL
-    const audioUrl = output[1]; // 音声URL
+    if (!output) throw new Error("No valid stream found");
 
     res.json({
-      video: videoUrl,
-      audio: audioUrl,
-      source: "yt-dlp-with-cookies"
+      video: output,
+      audio: output,
+      source: "yt-dlp-progressive"
     });
 
   } catch (e) {
-    console.error("yt-dlp error:", e);
+    console.error("yt-dlp error:", e.message);
     res.status(500).json({
-      error: "failed_to_fetch_video",
+      error: "failed_to_extract_video",
       message: e.message
     });
   }
